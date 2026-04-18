@@ -104,8 +104,9 @@
   .notif-header { padding: 16px 20px; font-weight: 700; font-size: 16px; border-bottom: 1px solid; display: flex; justify-content: space-between; align-items: center; }
   body.dark .notif-header { border-bottom-color: #374151; }
   body.light .notif-header { border-bottom-color: #e5e7eb; }
-  .notif-item { padding: 14px 20px; border-bottom: 1px solid; cursor: pointer; }
+  .notif-item { padding: 14px 20px; border-bottom: 1px solid; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.3s; touch-action: pan-y; }
   .notif-item.unread { border-right: 3px solid #4ade80; }
+  .notif-delete-btn { position: absolute; left: 0; top: 0; bottom: 0; width: 80px; background: #dc2626; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; transform: translateX(-80px); transition: transform 0.3s; }
   .notif-empty { padding: 32px 20px; text-align: center; color: #6b7280; }
 </style>
 </head>
@@ -124,9 +125,7 @@
 </div>
 
 <div class="notif-panel" id="notifPanel">
-  <div class="notif-header">🔔 התראות
-    <button onclick="markAllRead()" style="background:none;border:none;color:#4ade80;cursor:pointer;font-size:13px;font-family:inherit">סמן הכל כנקרא</button>
-  </div>
+  <div class="notif-header">🔔 התראות</div>
   <div id="notifList"><div class="notif-empty">אין התראות</div></div>
 </div>
 
@@ -273,12 +272,42 @@ function renderNotifList() {
   if (!notifications.length) { el.innerHTML = `<div class="notif-empty">אין התראות עדיין</div>`; return; }
   el.innerHTML = notifications.slice(0,30).map(n => {
     const date = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleDateString("he-IL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
-    return `<div class="notif-item ${n.read?'':'unread'}" onclick="goToNotif('${n.id}','${n.catId}','${n.recipeId}')">
-      <div style="font-size:14px;margin-bottom:4px">${n.message}</div>
+    return `<div class="notif-item ${n.read?'':'unread'}" id="notif-${n.id}">
+      <div class="notif-delete-btn" id="del-${n.id}" onclick="deleteNotif('${n.id}')">🗑️ מחק</div>
+      <div style="font-size:14px;margin-bottom:4px" onclick="goToNotif('${n.id}','${n.catId}','${n.recipeId}')">${n.message}</div>
       <div style="font-size:12px;color:#6b7280">${date}</div>
     </div>`;
   }).join("");
+
+  // Swipe to delete
+  notifications.slice(0,30).forEach(n => {
+    const item = document.getElementById("notif-"+n.id);
+    const delBtn = document.getElementById("del-"+n.id);
+    if (!item) return;
+    let startX = 0, swiped = false;
+    item.addEventListener("touchstart", e => { startX = e.touches[0].clientX; swiped = false; }, { passive: true });
+    item.addEventListener("touchmove", e => {
+      const diff = startX - e.touches[0].clientX;
+      if (diff > 20) { item.style.transform = `translateX(-${Math.min(diff,80)}px)`; delBtn.style.transform = `translateX(${80-Math.min(diff,80)}px)`; swiped = diff > 50; }
+      else if (diff < -10) { item.style.transform = "translateX(0)"; delBtn.style.transform = "translateX(-80px)"; swiped = false; }
+    }, { passive: true });
+    item.addEventListener("touchend", () => {
+      if (!swiped) { item.style.transform = "translateX(0)"; delBtn.style.transform = "translateX(-80px)"; }
+      else { item.style.transform = "translateX(-80px)"; delBtn.style.transform = "translateX(0)"; }
+    });
+  });
 }
+
+window.deleteNotif = async (notifId) => {
+  try {
+    await deleteDoc(doc(db, "notifications", notifId));
+    notifications = notifications.filter(n => n.id !== notifId);
+    const unread = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById("notifBadge");
+    if (badge) { badge.textContent = unread; badge.style.display = unread > 0 ? "flex" : "none"; }
+    renderNotifList();
+  } catch(e) { alert("שגיאה במחיקה"); }
+};
 
 window.goToNotif = async (notifId, catId, recipeId) => {
   await updateDoc(doc(db, "notifications", notifId), { read: true });
@@ -286,17 +315,7 @@ window.goToNotif = async (notifId, catId, recipeId) => {
   currentCategory = catId; window.showRecipe(recipeId);
 };
 
-window.markAllRead = async () => {
-  try {
-    const unread = notifications.filter(n => !n.read);
-    if (unread.length === 0) return;
-    await Promise.all(unread.map(n => updateDoc(doc(db, "notifications", n.id), { read: true })));
-    notifications = notifications.map(n => ({ ...n, read: true }));
-    const badge = document.getElementById("notifBadge");
-    if (badge) { badge.style.display = "none"; badge.textContent = "0"; }
-    renderNotifList();
-  } catch(e) { console.log(e); }
-};
+
 
 window.toggleNotifPanel = () => document.getElementById("notifPanel").classList.toggle("open");
 
