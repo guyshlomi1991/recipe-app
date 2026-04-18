@@ -11,7 +11,6 @@
   body.dark { background: #0b0f14; color: #f9fafb; }
   body.dark .header { background: linear-gradient(180deg,#0f1923,#0b0f14); border-bottom: 1px solid #1f2937; }
   body.dark .input-field { background: rgba(255,255,255,0.06); border-color: #374151; color: #f9fafb; }
-  body.dark .input-field:focus { border-color: #6b7280; }
   body.dark .btn-outline { background: rgba(255,255,255,0.07); border-color: #374151; color: #d1d5db; }
   body.dark .card { background: rgba(255,255,255,0.04); border-color: #1f2937; }
   body.dark .card:hover { background: rgba(255,255,255,0.07); }
@@ -37,7 +36,6 @@
   body.light { background: #f3f4f6; color: #111827; }
   body.light .header { background: linear-gradient(180deg,#ffffff,#f3f4f6); border-bottom: 1px solid #e5e7eb; }
   body.light .input-field { background: #ffffff; border-color: #d1d5db; color: #111827; }
-  body.light .input-field:focus { border-color: #9ca3af; }
   body.light .input-field::placeholder { color: #9ca3af; }
   body.light .btn-outline { background: #ffffff; border: 1px solid #d1d5db; color: #374151; }
   body.light .card { background: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
@@ -65,13 +63,12 @@
   body.light .notif-item:hover { background: #f9fafb; }
   .header { padding: 14px 20px; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 100; }
   .container { max-width: 680px; margin: 0 auto; padding: 20px 16px; }
-  .btn { border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; transition: opacity 0.2s; }
-  .btn:hover { opacity: 0.85; }
+  .btn { border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; }
   .btn-google { background: #fff; color: #1f2937; display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 10px; font-size: 15px; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
   .btn-primary { background: #4ade80; color: #000; }
   .btn-danger { background: #dc2626; color: #fff; }
   .card { border-radius: 14px; border: 1px solid; padding: 20px; margin-bottom: 14px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
-  .input-field { width: 100%; border-radius: 8px; font-size: 14px; padding: 10px 14px; margin-bottom: 12px; outline: none; display: block; border: 1px solid; transition: border-color 0.2s; }
+  .input-field { width: 100%; border-radius: 8px; font-size: 14px; padding: 10px 14px; margin-bottom: 12px; outline: none; display: block; border: 1px solid; }
   .label { font-size: 13px; display: block; margin-bottom: 6px; }
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
   .modal { border-radius: 16px; border: 1px solid; padding: 28px 24px; max-width: 380px; width: 100%; text-align: center; }
@@ -79,7 +76,7 @@
   .page.active { display: block; }
   .spinner { width: 40px; height: 40px; border: 3px solid #374151; border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 40px auto; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .star { font-size: 22px; cursor: pointer; color: #9ca3af; transition: color 0.15s; }
+  .star { font-size: 22px; cursor: pointer; color: #9ca3af; }
   .star.active { color: #facc15; }
   .comment-card { border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
   .empty-state { text-align: center; padding: 48px 20px; border-radius: 14px; border: 1px dashed; }
@@ -87,20 +84,17 @@
   .dots-btn { border: none; border-radius: 8px; width: 34px; height: 34px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
   .dots-dropdown { position: absolute; left: 0; top: calc(100% + 6px); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 150px; display: none; z-index: 50; border: 1px solid; }
   .dots-dropdown.open { display: block; }
-  .dots-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 16px; background: none; border: none; cursor: pointer; font-size: 14px; text-align: right; font-family: inherit; transition: background 0.15s; }
+  .dots-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 11px 16px; background: none; border: none; cursor: pointer; font-size: 14px; text-align: right; font-family: inherit; }
   .dots-item.danger { color: #f87171; }
-  .dots-item.danger:hover { background: rgba(248,113,113,0.1) !important; }
   .search-bar { display: flex; gap: 10px; margin-bottom: 24px; }
   .search-input { flex: 1; border-radius: 10px; font-size: 15px; padding: 12px 16px; outline: none; border: 1px solid; }
-  .wakelock-btn { border-radius: 8px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: all 0.2s; padding: 6px 12px; border: 1px solid; }
-  .heart-btn { background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s; padding: 4px; }
-  .heart-btn:hover { transform: scale(1.2); }
+  .wakelock-btn { border-radius: 8px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid; background: none; }
+  .heart-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px; }
   .theme-toggle { background: none; border: 1px solid; border-radius: 20px; padding: 5px 12px; cursor: pointer; font-size: 16px; }
   body.dark .theme-toggle { border-color: #374151; color: #f9fafb; }
   body.light .theme-toggle { border-color: #d1d5db; color: #374151; }
-  .diff-btn { border: 1px solid; border-radius: 8px; padding: 7px 4px; font-size: 13px; cursor: pointer; flex: 1; transition: all 0.2s; font-family: inherit; }
+  .diff-btn { border: 1px solid; border-radius: 8px; padding: 7px 4px; font-size: 13px; cursor: pointer; flex: 1; font-family: inherit; }
   .diff-btn.selected { background: #4ade80 !important; color: #000 !important; border-color: #4ade80 !important; }
-  /* NOTIFICATIONS */
   .notif-bell { position: relative; background: none; border: 1px solid; border-radius: 20px; padding: 5px 10px; cursor: pointer; font-size: 16px; }
   body.dark .notif-bell { border-color: #374151; color: #f9fafb; }
   body.light .notif-bell { border-color: #d1d5db; color: #374151; }
@@ -110,7 +104,7 @@
   .notif-header { padding: 16px 20px; font-weight: 700; font-size: 16px; border-bottom: 1px solid; display: flex; justify-content: space-between; align-items: center; }
   body.dark .notif-header { border-bottom-color: #374151; }
   body.light .notif-header { border-bottom-color: #e5e7eb; }
-  .notif-item { padding: 14px 20px; border-bottom: 1px solid; cursor: pointer; transition: background 0.15s; }
+  .notif-item { padding: 14px 20px; border-bottom: 1px solid; cursor: pointer; }
   .notif-item.unread { border-right: 3px solid #4ade80; }
   .notif-empty { padding: 32px 20px; text-align: center; color: #6b7280; }
 </style>
@@ -129,25 +123,23 @@
   <button id="logoutBtn" class="btn btn-outline" style="display:none;padding:6px 14px;font-size:13px">יציאה</button>
 </div>
 
-<!-- NOTIF PANEL -->
 <div class="notif-panel" id="notifPanel">
-  <div class="notif-header">
-    🔔 התראות
+  <div class="notif-header">🔔 התראות
     <button onclick="markAllRead()" style="background:none;border:none;color:#4ade80;cursor:pointer;font-size:13px;font-family:inherit">סמן הכל כנקרא</button>
   </div>
-  <div id="notifList"><div class="notif-empty">אין התראות חדשות</div></div>
+  <div id="notifList"><div class="notif-empty">אין התראות</div></div>
 </div>
 
 <div id="loginPage" class="page active container" style="text-align:center;padding-top:60px">
   <div style="font-size:60px;margin-bottom:16px">🍽️</div>
   <h2 style="font-size:26px;margin-bottom:8px;font-family:'David',serif">ספר המתכונים של גיא שלומי</h2>
-  <p class="sub-text" style="margin-bottom:16px;font-size:15px">התחבר כדי לצפות במתכונים ולשמור מועדפים</p>
-  <button class="btn-google" onclick="signInWithGoogle()" style="margin:0 auto 16px">
+  <p class="sub-text" style="margin-bottom:40px;font-size:15px">התחבר כדי לצפות במתכונים ולשמור מועדפים</p>
+  <button class="btn-google" id="googleSignInBtn" style="margin:0 auto 16px">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.5 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.7-3.5-11.3-8.3l-6.5 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.8l6.2 5.2C41 35.8 44 30.3 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
     התחבר עם Google
   </button>
   <br>
-  <button class="btn btn-outline" onclick="viewOnly()" style="margin:0 auto">👁️ צפייה בלבד (ללא שמירת מועדפים)</button>
+  <button class="btn btn-outline" id="viewOnlyBtn" style="margin:0 auto">👁️ צפייה בלבד</button>
 </div>
 
 <div id="homePage" class="page container"></div>
@@ -171,7 +163,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc,
   orderBy, query, setDoc, getDoc, onSnapshot, serverTimestamp }
@@ -188,16 +180,9 @@ const firebaseConfig = {
 
 const TELEGRAM_TOKEN = "8786680475:AAFXx_UFWY8upN-n6htpv1B-QiULM4FQBV4";
 const TELEGRAM_CHAT_ID = "43583668";
+const ADMIN_UID = "ZXJCzFhMzvNs2thaMXh1v5NaosI2";
+const SITE_URL = "https://guyshlomi1991.github.io/recipe-app";
 
-async function sendTelegram(message) {
-  try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "HTML" })
-    });
-  } catch(e) {}
-}
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -230,25 +215,86 @@ window.toggleTheme = () => {
   localStorage.setItem("theme", isDark ? "light" : "dark");
 };
 
-// DEEP LINK — פתיחת מתכון ישירות מקישור
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.getElementById("notifPanel").classList.remove("open");
+}
+
 function checkDeepLink() {
   const params = new URLSearchParams(window.location.search);
-  const cat = params.get("cat");
-  const recipe = params.get("recipe");
-  if (cat && recipe) {
-    currentCategory = cat;
-    window.showRecipe(recipe);
-    return true;
-  }
+  const cat = params.get("cat"), recipe = params.get("recipe");
+  if (cat && recipe) { currentCategory = cat; window.showRecipe(recipe); return true; }
   return false;
 }
 
 // WAKE LOCK
 async function requestWakeLock() {
-  try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); return true; } } catch(e) {}
-  return false;
+  try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch(e) {}
 }
 async function releaseWakeLock() { if (wakeLock) { await wakeLock.release(); wakeLock = null; } }
+
+// TELEGRAM
+async function sendTelegram(message) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "HTML" })
+    });
+  } catch(e) {}
+}
+
+// NOTIFICATIONS
+async function addNotification(type, message, catId, recipeId) {
+  try {
+    await addDoc(collection(db, "notifications"), { type, message, catId, recipeId, read: false, createdAt: serverTimestamp() });
+    const url = `${SITE_URL}?cat=${catId}&recipe=${recipeId}`;
+    await sendTelegram(`🍽️ <b>ספר המתכונים</b>\n\n${message}\n\n<a href="${url}">לחץ לצפייה במתכון</a>`);
+  } catch(e) {}
+}
+
+function listenNotifications() {
+  document.getElementById("notifBtn").style.display = "block";
+  if (unsubNotif) unsubNotif();
+  unsubNotif = onSnapshot(query(collection(db, "notifications"), orderBy("createdAt", "desc")), (snap) => {
+    notifications = [];
+    snap.forEach(d => notifications.push({ id: d.id, ...d.data() }));
+    const unread = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById("notifBadge");
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? "flex" : "none";
+    renderNotifList();
+  });
+}
+
+function renderNotifList() {
+  const el = document.getElementById("notifList");
+  if (!notifications.length) { el.innerHTML = `<div class="notif-empty">אין התראות עדיין</div>`; return; }
+  el.innerHTML = notifications.slice(0,30).map(n => {
+    const date = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleDateString("he-IL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
+    return `<div class="notif-item ${n.read?'':'unread'}" onclick="goToNotif('${n.id}','${n.catId}','${n.recipeId}')">
+      <div style="font-size:14px;margin-bottom:4px">${n.message}</div>
+      <div style="font-size:12px;color:#6b7280">${date}</div>
+    </div>`;
+  }).join("");
+}
+
+window.goToNotif = async (notifId, catId, recipeId) => {
+  await updateDoc(doc(db, "notifications", notifId), { read: true });
+  document.getElementById("notifPanel").classList.remove("open");
+  currentCategory = catId; window.showRecipe(recipeId);
+};
+
+window.markAllRead = async () => {
+  const promises = notifications.filter(n => !n.read).map(n => updateDoc(doc(db, "notifications", n.id), { read: true }));
+  await Promise.all(promises);
+  notifications = notifications.map(n => ({ ...n, read: true }));
+  document.getElementById("notifBadge").style.display = "none";
+  renderNotifList();
+};
+
+window.toggleNotifPanel = () => document.getElementById("notifPanel").classList.toggle("open");
 
 // FAVORITES
 async function loadFavorites() {
@@ -264,87 +310,12 @@ async function toggleFavorite(recipeId, catId, recipeName) {
   const isFav = userFavorites.some(f => f.id === recipeId);
   userFavorites = isFav ? userFavorites.filter(f => f.id !== recipeId) : [...userFavorites, { id: recipeId, cat: catId }];
   await setDoc(doc(db, "favorites", currentUser.uid), { list: userFavorites });
-  if (!isFav) {
-    await addNotification("like", `❤️ ${currentUser.displayName || "מישהו"} אהב את המתכון "${recipeName}"`, catId, recipeId);
-  }
+  if (!isFav && recipeName) await addNotification("like", `❤️ ${currentUser.displayName || "מישהו"} אהב את "${recipeName}"`, catId, recipeId);
   return !isFav;
 }
 
-// NOTIFICATIONS
-async function addNotification(type, message, catId, recipeId) {
-  try {
-    await addDoc(collection(db, "notifications"), {
-      type, message, catId, recipeId,
-      read: false,
-      createdAt: serverTimestamp()
-    });
-    // שלח ל-Telegram
-    const cat = CATEGORIES.find(c => c.id === catId);
-    const siteUrl = `https://neon-torte-844912.netlify.app?cat=${catId}&recipe=${recipeId}`;
-    await sendTelegram(`🍽️ <b>ספר המתכונים</b>\n\n${message}\n\n<a href="${siteUrl}">לחץ לצפייה במתכון</a>`);
-  } catch(e) {}
-}
-
-function listenNotifications() {
-  if (!isAdmin) return;
-  document.getElementById("notifBtn").style.display = "block";
-  if (unsubNotif) unsubNotif();
-  unsubNotif = onSnapshot(
-    query(collection(db, "notifications"), orderBy("createdAt", "desc")),
-    (snap) => {
-      notifications = [];
-      snap.forEach(d => notifications.push({ id: d.id, ...d.data() }));
-      const unread = notifications.filter(n => !n.read).length;
-      const badge = document.getElementById("notifBadge");
-      badge.textContent = unread;
-      badge.style.display = unread > 0 ? "flex" : "none";
-      renderNotifList();
-    }
-  );
-}
-
-function renderNotifList() {
-  const el = document.getElementById("notifList");
-  if (!notifications.length) { el.innerHTML = `<div class="notif-empty">אין התראות עדיין</div>`; return; }
-  el.innerHTML = notifications.slice(0, 30).map(n => {
-    const date = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleDateString("he-IL", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "";
-    return `<div class="notif-item ${n.read?'':'unread'}" onclick="goToNotif('${n.id}','${n.catId}','${n.recipeId}')">
-      <div style="font-size:14px;margin-bottom:4px">${n.message}</div>
-      <div style="font-size:12px;color:#6b7280">${date}</div>
-    </div>`;
-  }).join("");
-}
-
-window.goToNotif = async (notifId, catId, recipeId) => {
-  await updateDoc(doc(db, "notifications", notifId), { read: true });
-  document.getElementById("notifPanel").classList.remove("open");
-  currentCategory = catId;
-  window.showRecipe(recipeId);
-};
-
-window.markAllRead = async () => {
-  const unread = notifications.filter(n => !n.read);
-  const promises = unread.map(n => updateDoc(doc(db, "notifications", n.id), { read: true }));
-  await Promise.all(promises);
-  notifications = notifications.map(n => ({ ...n, read: true }));
-  document.getElementById("notifBadge").style.display = "none";
-  renderNotifList();
-};
-
-window.toggleNotifPanel = () => {
-  document.getElementById("notifPanel").classList.toggle("open");
-};
-
-// Request Push permission for admin
-async function requestPushPermission() {
-  if (!isAdmin) return;
-  if (Notification.permission === "default") {
-    await Notification.requestPermission();
-  }
-}
-
 // AUTH
-window.signInWithGoogle = async () => {
+document.getElementById("googleSignInBtn").addEventListener("click", async () => {
   try {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
@@ -354,18 +325,20 @@ window.signInWithGoogle = async () => {
       alert("שגיאה: " + e.message);
     }
   }
-};
+});
 
-window.viewOnly = () => { isViewOnly = true; if (!checkDeepLink()) showHome(); };
+document.getElementById("viewOnlyBtn").addEventListener("click", () => {
+  isViewOnly = true; showHome();
+});
 
 window.signOutUser = async () => {
   if (unsubNotif) unsubNotif();
   await signOut(auth);
   isViewOnly = false; isAdmin = false; userFavorites = [];
   document.getElementById("notifBtn").style.display = "none";
-  showPage("loginPage");
   document.getElementById("logoutBtn").style.display = "none";
   document.getElementById("headerSub").textContent = "";
+  showPage("loginPage");
 };
 
 onAuthStateChanged(auth, async (user) => {
@@ -377,7 +350,6 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("headerSub").textContent = "מנהל: " + user.displayName;
     await loadFavorites();
     listenNotifications();
-    requestPushPermission();
     if (!checkDeepLink()) showHome();
   } else if (user) {
     isAdmin = false; isViewOnly = false;
@@ -393,12 +365,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.getElementById("notifPanel").classList.remove("open");
-}
-
 async function loadAllRecipes() {
   allRecipes = [];
   for (const cat of CATEGORIES) {
@@ -409,14 +375,10 @@ async function loadAllRecipes() {
 
 function showHome() {
   document.getElementById("backBtn").style.display = "none";
-  if (!isAdmin && !currentUser) {
+  if (!currentUser && isViewOnly) {
     document.getElementById("headerSub").textContent = "צפייה בלבד";
     document.getElementById("logoutBtn").style.display = "block";
-    document.getElementById("logoutBtn").onclick = () => {
-      isViewOnly = false; showPage("loginPage");
-      document.getElementById("logoutBtn").style.display = "none";
-      document.getElementById("headerSub").textContent = "";
-    };
+    document.getElementById("logoutBtn").onclick = () => { isViewOnly = false; showPage("loginPage"); document.getElementById("logoutBtn").style.display = "none"; document.getElementById("headerSub").textContent = ""; };
   }
   const favColor = document.body.classList.contains("light") ? "#4f46e5" : "#818cf8";
   const favBg = document.body.classList.contains("light") ? "#eef2ff" : "#1a1a2e";
@@ -427,9 +389,8 @@ function showHome() {
         <div style="font-size:18px;font-weight:700;color:${favColor};font-family:'David',serif">❤️ המתכונים שאהבתי</div>
         <div class="sub-text" style="font-size:13px;margin-top:3px">${userFavorites.length} מתכונים שמורים</div>
       </div>
-      <span style="color:${favColor};font-size:20px;opacity:0.7">←</span>
+      <span style="color:${favColor};font-size:20px">←</span>
     </div>` : "";
-
   el.innerHTML = `
     <div style="text-align:center;margin-bottom:24px">
       <h2 style="font-family:'David',serif;font-size:28px;margin-bottom:8px">ברוכים הבאים</h2>
@@ -445,10 +406,8 @@ function showHome() {
           <div style="font-size:18px;font-weight:700;color:${c.color};font-family:'David',serif">${c.label}</div>
           <div class="sub-text" style="font-size:13px;margin-top:3px" id="count-${c.id}">טוען...</div>
         </div>
-        <span style="color:${c.color};font-size:20px;opacity:0.7">←</span>
-      </div>
-    `).join("")}
-  `;
+        <span style="color:${c.color};font-size:20px">←</span>
+      </div>`).join("")}`;
   showPage("homePage");
   CATEGORIES.forEach(async c => {
     const snap = await getDocs(collection(db, c.id));
@@ -458,7 +417,6 @@ function showHome() {
   loadAllRecipes();
 }
 
-// SEARCH
 window.debouncedSearch = (val) => {
   clearTimeout(searchTimer);
   if (!val.trim()) return;
@@ -466,13 +424,8 @@ window.debouncedSearch = (val) => {
 };
 
 window.handleSearch = (val) => {
-  if (!val.trim()) return;
   const term = val.trim().toLowerCase();
-  const results = allRecipes.filter(r =>
-    r.name?.toLowerCase().includes(term) ||
-    r.ingredients?.toLowerCase().includes(term) ||
-    r.instructions?.toLowerCase().includes(term)
-  );
+  const results = allRecipes.filter(r => r.name?.toLowerCase().includes(term) || r.ingredients?.toLowerCase().includes(term) || r.instructions?.toLowerCase().includes(term));
   document.getElementById("backBtn").style.display = "block";
   document.getElementById("backBtn").onclick = showHome;
   const el = document.getElementById("searchPage");
@@ -482,20 +435,16 @@ window.handleSearch = (val) => {
     </div>
     <p class="sub-text" style="font-size:14px;margin-bottom:20px">חיפשת: "<strong>${val}</strong>" — ${results.length} תוצאות</p>
     ${results.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">🔍</div><p class="sub-text">לא נמצאו מתכונים</p></div>` :
-      results.map(r => {
-        const cat = CATEGORIES.find(c => c.id === r.catId);
+      results.map(r => { const cat = CATEGORIES.find(c => c.id === r.catId);
         return `<div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;margin-bottom:12px;cursor:pointer" onclick="currentCategory='${r.catId}';showRecipe('${r.id}')">
           <div style="font-weight:600;font-size:16px">${r.name}</div>
           <div style="color:${cat.color};font-size:12px;margin-top:4px">${cat.label}</div>
-        </div>`;
-      }).join("")}
-  `;
+        </div>`;}).join("")}`;
   showPage("searchPage");
   const inp2 = document.getElementById("searchInput2");
   if (inp2) { inp2.focus(); inp2.setSelectionRange(inp2.value.length, inp2.value.length); }
 };
 
-// FAVORITES PAGE
 window.showFavorites = async () => {
   document.getElementById("backBtn").style.display = "block";
   document.getElementById("backBtn").onclick = showHome;
@@ -510,18 +459,15 @@ window.showFavorites = async () => {
   const favColor = document.body.classList.contains("light") ? "#4f46e5" : "#818cf8";
   el.innerHTML = `
     <h2 style="font-family:'David',serif;font-size:24px;color:${favColor};margin-bottom:20px">❤️ המתכונים שאהבתי</h2>
-    ${favRecipes.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">❤️</div><p class="sub-text">עדיין לא שמרת מתכונים מועדפים</p></div>` :
-      favRecipes.map(r => {
-        const cat = CATEGORIES.find(c => c.id === r.catId);
+    ${favRecipes.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">❤️</div><p class="sub-text">עדיין לא שמרת מועדפים</p></div>` :
+      favRecipes.map(r => { const cat = CATEGORIES.find(c => c.id === r.catId);
         return `<div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div onclick="currentCategory='${r.catId}';showRecipe('${r.id}')" style="flex:1;cursor:pointer">
             <div style="font-weight:600;font-size:16px">${r.name}</div>
             <div style="color:${cat.color};font-size:12px;margin-top:4px">${cat.label}</div>
           </div>
           <button class="heart-btn" onclick="removeFav('${r.id}','${r.catId}')">❤️</button>
-        </div>`;
-      }).join("")}
-  `;
+        </div>`;}).join("")}`;
 };
 
 window.removeFav = async (id, catId) => { await toggleFavorite(id, catId, ""); window.showFavorites(); };
@@ -543,48 +489,30 @@ window.showCategory = async (catId) => {
       <h2 style="font-family:'David',serif;font-size:24px;color:${cat.color}">${cat.label}</h2>
       ${isAdmin ? `<button class="btn btn-primary" onclick="showForm(null)" style="padding:8px 18px">+ הוסף</button>` : ""}
     </div>
-    ${recipes.length === 0 ? `
-      <div class="empty-state">
-        <div style="font-size:48px;margin-bottom:12px">🍴</div>
-        <p class="sub-text">עדיין אין מתכונים בקטגוריה זו</p>
-        ${isAdmin ? `<button class="btn btn-primary" onclick="showForm(null)" style="margin-top:12px">+ הוסף מתכון ראשון</button>` : ""}
-      </div>
-    ` : recipes.map(r => {
-      const isFav = userFavorites.some(f => f.id === r.id);
-      return `
-        <div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    ${recipes.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">🍴</div><p class="sub-text">אין מתכונים עדיין</p></div>` :
+      recipes.map(r => { const isFav = userFavorites.some(f => f.id === r.id);
+        return `<div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div onclick="showRecipe('${r.id}')" style="flex:1;cursor:pointer">
             <div style="font-weight:600;font-size:16px">${r.name}</div>
-            <div class="sub-text" style="font-size:13px;margin-top:4px">
-              ${(r.comments||[]).length} תגובות
-              ${r.cookTime ? `· ⏱️ ${r.cookTime}` : ""}
-              ${r.difficulty ? `· ${r.difficulty}` : ""}
-            </div>
+            <div class="sub-text" style="font-size:13px;margin-top:4px">${(r.comments||[]).length} תגובות${r.cookTime?` · ⏱️ ${r.cookTime}`:""}${r.difficulty?` · ${r.difficulty}`:""}</div>
           </div>
-          ${currentUser ? `<button class="heart-btn" id="heart-${r.id}" onclick="handleHeart('${r.id}','${catId}','${r.name.replace(/'/g,"\\'")}',this)">${isFav?'❤️':'🤍'}</button>` : ""}
-          ${isAdmin ? `
-            <div class="dots-menu">
-              <button class="dots-btn" onclick="toggleMenu('${r.id}',event)">
-                <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
-                <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
-                <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
-              </button>
-              <div class="dots-dropdown" id="dd-${r.id}">
-                <button class="dots-item" style="color:${cat.color}" onclick="showForm('${r.id}')">✏️ ערוך מתכון</button>
-                <div style="height:1px;background:#374151"></div>
-                <button class="dots-item danger" onclick="openDeleteModal('${r.id}','${r.name.replace(/'/g,"\\'")}')">🗑️ מחק מתכון</button>
-              </div>
-            </div>
-          ` : ""}
-        </div>
-      `;
-    }).join("")}
-  `;
+          ${currentUser ? `<button class="heart-btn" onclick="handleHeart('${r.id}','${catId}','${r.name.replace(/'/g,"\\'")}',this)">${isFav?'❤️':'🤍'}</button>` : ""}
+          ${isAdmin ? `<div class="dots-menu"><button class="dots-btn" onclick="toggleMenu('${r.id}',event)">
+            <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
+            <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
+            <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
+          </button>
+          <div class="dots-dropdown" id="dd-${r.id}">
+            <button class="dots-item" style="color:${cat.color}" onclick="showForm('${r.id}')">✏️ ערוך</button>
+            <div style="height:1px;background:#374151"></div>
+            <button class="dots-item danger" onclick="openDeleteModal('${r.id}','${r.name.replace(/'/g,"\\'")}')">🗑️ מחק</button>
+          </div></div>` : ""}
+        </div>`;}).join("")}`;
 };
 
 window.handleHeart = async (recipeId, catId, recipeName, btn) => {
   const isFav = await toggleFavorite(recipeId, catId, recipeName);
-  btn.textContent = isFav ? '❤️' : '🤍';
+  if (btn) btn.textContent = isFav ? '❤️' : '🤍';
 };
 
 window.toggleMenu = (id, e) => {
@@ -592,6 +520,7 @@ window.toggleMenu = (id, e) => {
   document.querySelectorAll(".dots-dropdown").forEach(d => { if(d.id !== "dd-"+id) d.classList.remove("open"); });
   document.getElementById("dd-"+id).classList.toggle("open");
 };
+
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".dots-menu")) document.querySelectorAll(".dots-dropdown").forEach(d => d.classList.remove("open"));
   if (!e.target.closest("#notifBtn") && !e.target.closest("#notifPanel")) document.getElementById("notifPanel").classList.remove("open");
@@ -610,33 +539,24 @@ window.showRecipe = async (recipeId) => {
   const comments = recipe.comments || [];
   const avg = comments.length > 0 ? (comments.reduce((s,c)=>s+c.rating,0)/comments.length).toFixed(1) : null;
   const isFav = userFavorites.some(f => f.id === recipeId);
-  const isWake = wakeLock !== null;
-
-  const diffMap = { "קל 🟢": "#16a34a", "בינוני 🟡": "#ca8a04", "קשה 🔴": "#dc2626" };
+  const diffMap = {"קל 🟢":"#16a34a","בינוני 🟡":"#ca8a04","קשה 🔴":"#dc2626"};
   const diffColor = diffMap[recipe.difficulty] || "#6b7280";
-
   const el = document.getElementById("recipePage");
   el.innerHTML = `
     <div class="recipe-card" style="border-radius:16px;border:1px solid ${cat.color}44;padding:24px;margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;flex-wrap:wrap">
         <h2 style="color:${cat.color};font-size:24px;font-family:'David',serif;flex:1">${recipe.name}</h2>
-        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
-          ${currentUser ? `<button class="heart-btn" id="recipeHeart" onclick="handleRecipeHeart('${recipeId}','${currentCategory}','${recipe.name.replace(/'/g,"\\'")}' )">${isFav?'❤️':'🤍'}</button>` : ""}
-          <button onclick="shareWhatsapp('${recipeId}')" style="background:#25d366;border:none;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:4px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            שתף
-          </button>
-          <button class="wakelock-btn ${isWake?'active':''}" id="wakeBtn" onclick="toggleWakeLock()">
-            ${isWake ? '🔆 דולק' : '💡 שמור דולק'}
-          </button>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${currentUser ? `<button class="heart-btn" id="recipeHeart" onclick="handleRecipeHeart('${recipeId}','${currentCategory}','${recipe.name.replace(/'/g,"\\'")}')"> ${isFav?'❤️':'🤍'}</button>` : ""}
+          <button onclick="shareWhatsapp('${recipeId}')" style="background:#25d366;border:none;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:600">📤 שתף</button>
+          <button class="wakelock-btn" id="wakeBtn" onclick="toggleWakeLock()">💡 שמור דולק</button>
         </div>
       </div>
       ${avg ? `<div style="color:#facc15;margin-bottom:10px">★ ${avg} (${comments.length} ביקורות)</div>` : ""}
-      ${(recipe.cookTime || recipe.difficulty) ? `
-        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-          ${recipe.cookTime ? `<span style="background:rgba(99,102,241,0.15);color:#818cf8;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600">⏱️ ${recipe.cookTime}</span>` : ""}
-          ${recipe.difficulty ? `<span style="background:${diffColor}22;color:${diffColor};padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600">${recipe.difficulty}</span>` : ""}
-        </div>` : ""}
+      ${(recipe.cookTime||recipe.difficulty) ? `<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        ${recipe.cookTime?`<span style="background:rgba(99,102,241,0.15);color:#818cf8;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600">⏱️ ${recipe.cookTime}</span>`:""}
+        ${recipe.difficulty?`<span style="background:${diffColor}22;color:${diffColor};padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600">${recipe.difficulty}</span>`:""}
+      </div>`:""}
       <h3 class="recipe-heading" style="font-size:15px;margin-bottom:8px">🧂 מצרכים</h3>
       <ul class="recipe-text" style="line-height:1.9;padding-right:22px;padding-left:0;margin-bottom:20px">
         ${recipe.ingredients.split(/,|،|\n/).filter(i=>i.trim()).map(i=>`<li>${i.trim()}</li>`).join("")}
@@ -646,16 +566,14 @@ window.showRecipe = async (recipeId) => {
     </div>
     <div class="comments-section" style="border-radius:16px;border:1px solid;padding:24px">
       <h3 style="font-size:18px;font-family:'David',serif;margin-bottom:20px">💬 תגובות</h3>
-      ${comments.length === 0 ? `<p class="sub-text" style="font-size:14px;margin-bottom:16px">עדיין אין תגובות.</p>` :
-        comments.map(c => `
-          <div class="comment-card" style="border-right:3px solid ${cat.color}">
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-              <span style="color:${cat.color};font-weight:600">${c.user}</span>
-              <span style="color:#facc15">${"★".repeat(c.rating)}${"☆".repeat(5-c.rating)}</span>
-            </div>
-            <p class="recipe-text" style="font-size:14px">${c.text}</p>
+      ${comments.length===0?`<p class="sub-text" style="font-size:14px;margin-bottom:16px">עדיין אין תגובות.</p>`:
+        comments.map(c=>`<div class="comment-card" style="border-right:3px solid ${cat.color}">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="color:${cat.color};font-weight:600">${c.user}</span>
+            <span style="color:#facc15">${"★".repeat(c.rating)}${"☆".repeat(5-c.rating)}</span>
           </div>
-        `).join("")}
+          <p class="recipe-text" style="font-size:14px">${c.text}</p>
+        </div>`).join("")}
       <div style="padding-top:20px;margin-top:8px;border-top:1px solid #374151">
         <input id="commentUser" class="input-field" placeholder="השם שלך (אופציונלי)" dir="rtl">
         <textarea id="commentText" class="input-field" placeholder="כתוב תגובה..." rows="3" style="resize:vertical;height:80px" dir="rtl"></textarea>
@@ -666,8 +584,7 @@ window.showRecipe = async (recipeId) => {
           <button class="btn btn-primary" onclick="submitComment('${recipeId}','${recipe.name.replace(/'/g,"\\'")}')">שלח תגובה</button>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
   showPage("recipePage");
 };
 
@@ -678,8 +595,7 @@ window.handleRecipeHeart = async (recipeId, catId, recipeName) => {
 };
 
 window.shareWhatsapp = (recipeId) => {
-  const base = window.location.origin + window.location.pathname;
-  const url = `${base}?cat=${currentCategory}&recipe=${recipeId}`;
+  const url = `${SITE_URL}?cat=${currentCategory}&recipe=${recipeId}`;
   const text = `בוא תראה את המתכון "${currentRecipe.name}" בספר המתכונים של גיא שלומי! 🍽️\n${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 };
@@ -687,7 +603,7 @@ window.shareWhatsapp = (recipeId) => {
 window.toggleWakeLock = async () => {
   if (wakeLock) { await releaseWakeLock(); } else { await requestWakeLock(); }
   const btn = document.getElementById("wakeBtn");
-  if (btn) { btn.className = `wakelock-btn ${wakeLock?'active':''}`; btn.textContent = wakeLock ? '🔆 דולק' : '💡 שמור דולק'; }
+  if (btn) { btn.className = `wakelock-btn${wakeLock?' active':''}`; btn.textContent = wakeLock ? '🔆 דולק' : '💡 שמור דולק'; }
 };
 
 window.setRating = (n) => {
@@ -701,7 +617,7 @@ window.submitComment = async (recipeId, recipeName) => {
   const user = document.getElementById("commentUser").value.trim() || "אנונימי";
   const comments = [...(currentRecipe.comments||[]), { user, text, rating: selectedRating }];
   await updateDoc(doc(db, currentCategory, recipeId), { comments });
-  await addNotification("comment", `💬 ${user} הגיב על "${recipeName}": "${text.slice(0,40)}${text.length>40?'...':''}" ⭐${selectedRating}`, currentCategory, recipeId);
+  await addNotification("comment", `💬 ${user} הגיב על "${recipeName}": "${text.slice(0,40)}" ⭐${selectedRating}`, currentCategory, recipeId);
   currentRecipe.comments = comments; selectedRating = 0;
   window.showRecipe(recipeId);
 };
@@ -712,16 +628,14 @@ window.showForm = async (recipeId) => {
   let name="", ingredients="", instructions="";
   if (recipeId) {
     const snap = await getDocs(collection(db, currentCategory));
-    snap.forEach(d => { if(d.id===recipeId) editingRecipe = {id:d.id,...d.data()}; });
+    snap.forEach(d => { if(d.id===recipeId) editingRecipe={id:d.id,...d.data()}; });
     if (editingRecipe) { name=editingRecipe.name; ingredients=editingRecipe.ingredients; instructions=editingRecipe.instructions; }
   }
   const savedDiff = editingRecipe?.difficulty || "";
   document.getElementById("backBtn").onclick = () => window.showCategory(currentCategory);
   document.getElementById("formPage").innerHTML = `
     <div class="recipe-card" style="border-radius:16px;border:1px solid ${cat.color}55;padding:24px">
-      <h2 style="color:${cat.color};font-family:'David',serif;font-size:22px;margin-bottom:20px">
-        ${recipeId ? "✏️ עריכת מתכון" : "✍️ הוספת מתכון חדש"}
-      </h2>
+      <h2 style="color:${cat.color};font-family:'David',serif;font-size:22px;margin-bottom:20px">${recipeId?"✏️ עריכת מתכון":"✍️ הוספת מתכון חדש"}</h2>
       <label class="label">שם המתכון *</label>
       <input id="fName" class="input-field" value="${name}" placeholder="לדוג׳: פסטה בולונז" dir="rtl">
       <div style="display:flex;gap:12px;margin-bottom:12px">
@@ -732,10 +646,7 @@ window.showForm = async (recipeId) => {
         <div style="flex:1">
           <label class="label">רמת קושי</label>
           <div style="display:flex;gap:6px;margin-top:4px">
-            ${["קל 🟢","בינוני 🟡","קשה 🔴"].map(d => `
-              <button type="button" class="diff-btn ${savedDiff===d?'selected':''}" data-diff="${d}" onclick="selectDiff(this)">
-                ${d}
-              </button>`).join('')}
+            ${["קל 🟢","בינוני 🟡","קשה 🔴"].map(d=>`<button type="button" class="diff-btn${savedDiff===d?' selected':''}" data-diff="${d}" onclick="selectDiff(this)">${d}</button>`).join('')}
           </div>
         </div>
       </div>
@@ -744,10 +655,9 @@ window.showForm = async (recipeId) => {
       <label class="label">אופן הכנה *</label>
       <textarea id="fInstructions" class="input-field" placeholder="תאר את שלבי ההכנה..." rows="5" style="height:130px;resize:vertical" dir="rtl">${instructions}</textarea>
       <button class="btn btn-primary" onclick="saveRecipe('${recipeId||""}')" style="width:100%;padding:14px;font-size:16px;border-radius:10px;margin-top:4px">
-        💾 ${recipeId ? "שמור שינויים" : "שמור מתכון"}
+        💾 ${recipeId?"שמור שינויים":"שמור מתכון"}
       </button>
-    </div>
-  `;
+    </div>`;
   showPage("formPage");
 };
 
@@ -763,13 +673,10 @@ window.saveRecipe = async (recipeId) => {
   const cookTime = document.getElementById("fTime").value.trim();
   const diffBtn = document.querySelector(".diff-btn.selected");
   const difficulty = diffBtn ? diffBtn.dataset.diff : "";
-  if (!name || !ingredients || !instructions) { alert("נא למלא את כל השדות"); return; }
+  if (!name||!ingredients||!instructions) { alert("נא למלא את כל השדות"); return; }
   const data = { name, ingredients, instructions, cookTime, difficulty };
-  if (recipeId) {
-    await updateDoc(doc(db, currentCategory, recipeId), data);
-  } else {
-    await addDoc(collection(db, currentCategory), { ...data, comments: [], createdAt: Date.now() });
-  }
+  if (recipeId) { await updateDoc(doc(db, currentCategory, recipeId), data); }
+  else { await addDoc(collection(db, currentCategory), {...data, comments:[], createdAt:Date.now()}); }
   window.showCategory(currentCategory);
 };
 
@@ -783,8 +690,6 @@ window.confirmDelete = async () => {
   await deleteDoc(doc(db, currentCategory, deleteTargetId));
   window.closeDeleteModal(); window.showCategory(currentCategory);
 };
-
-None
 </script>
 </body>
 </html>
