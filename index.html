@@ -163,13 +163,561 @@
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc,
-  orderBy, query, setDoc, getDoc, onSnapshot, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBXUxSpdJO052huhnyEPSOAlWYV4Ti9Tyk",
+  authDomain: "chef-guy-shlomi.firebaseapp.com",
+  projectId: "chef-guy-shlomi",
+  storageBucket: "chef-guy-shlomi.firebasestorage.app",
+  messagingSenderId: "125665332795",
+  appId: "1:125665332795:web:95c022300e37aa8ec9961e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const TELEGRAM_TOKEN = "8786680475:AAFXx_UFWY8upN-n6htpv1B-QiULM4FQBV4";
+const TELEGRAM_CHAT_ID = "7091167889";
+const ADMIN_UID = "ZXJCzFhMzvNs2thaMXh1v5NaosI2";
+const SITE_URL = "https://guyshlomi1991.github.io/recipe-app";
+
+let currentUser = null, isAdmin = false, isViewOnly = false;
+let currentCategory = null, currentRecipe = null, deleteTargetId = null;
+let selectedRating = 0, userFavorites = [], wakeLock = null, allRecipes = [];
+let searchTimer = null, notifications = [], unsubNotif = null;
+
+const CATEGORIES = [
+  { id: "salads", label: "🥗 סלטים", color: "#16a34a", darkBg: "#052e16", lightBg: "#dcfce7" },
+  { id: "sides", label: "🍚 תוספות", color: "#ca8a04", darkBg: "#1c1400", lightBg: "#fef9c3" },
+  { id: "soups", label: "🍲 מרקים", color: "#7c3aed", darkBg: "#1a0938", lightBg: "#ede9fe" },
+  { id: "pastry", label: "🥐 מאפים חלבי/בשרי", color: "#ea580c", darkBg: "#2d1000", lightBg: "#ffedd5" },
+  { id: "meat", label: "🥩 בשר ועוף", color: "#dc2626", darkBg: "#2d0000", lightBg: "#fee2e2" },
+  { id: "fish", label: "🐟 דגים", color: "#0284c7", darkBg: "#001d2e", lightBg: "#e0f2fe" },
+  { id: "desserts", label: "🍰 קינוחים", color: "#db2777", darkBg: "#2d0018", lightBg: "#fce7f3" },
+];
+
+function getCatBg(cat) { return document.body.classList.contains("light") ? cat.lightBg : cat.darkBg; }
+
+// THEME
+const savedTheme = localStorage.getItem("theme") || "dark";
+document.body.className = savedTheme;
+document.getElementById("themeBtn").textContent = savedTheme === "dark" ? "🌙" : "☀️";
+
+function toggleTheme() {
+  const isDark = document.body.classList.contains("dark");
+  document.body.className = isDark ? "light" : "dark";
+  document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+  localStorage.setItem("theme", isDark ? "light" : "dark");
+}
+
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  const np = document.getElementById("notifPanel");
+  if (np) np.classList.remove("open");
+}
+
+function checkDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get("cat"), recipe = params.get("recipe");
+  if (cat && recipe) { currentCategory = cat; showRecipe(recipe); return true; }
+  return false;
+}
+
+async function requestWakeLock() {
+  try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch(e) {}
+}
+async function releaseWakeLock() { if (wakeLock) { await wakeLock.release(); wakeLock = null; } }
+
+async function sendTelegram(message) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "HTML" })
+    });
+  } catch(e) {}
+}
+
+async function addNotification(type, message, catId, recipeId) {
+  try {
+    await db.collection("notifications").add({ type, message, catId, recipeId, read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    const url = `${SITE_URL}?cat=${catId}&recipe=${recipeId}`;
+    await sendTelegram(`🍽️ <b>ספר המתכונים</b>\n\n${message}\n\n<a href="${url}">לחץ לצפייה במתכון</a>`);
+  } catch(e) {}
+}
+
+function listenNotifications() {
+  document.getElementById("notifBtn").style.display = "block";
+  if (unsubNotif) unsubNotif();
+  unsubNotif = db.collection("notifications").orderBy("createdAt", "desc").onSnapshot(snap => {
+    notifications = [];
+    snap.forEach(d => notifications.push({ id: d.id, ...d.data() }));
+    const unread = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById("notifBadge");
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? "flex" : "none";
+    renderNotifList();
+  });
+}
+
+function renderNotifList() {
+  const el = document.getElementById("notifList");
+  if (!notifications.length) { el.innerHTML = `<div class="notif-empty">אין התראות עדיין</div>`; return; }
+  el.innerHTML = notifications.slice(0,30).map(n => {
+    const date = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleDateString("he-IL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
+    return `<div class="notif-wrapper" id="wrapper-${n.id}">
+      <button class="notif-delete-btn" onclick="deleteNotif('${n.id}')">🗑️<br>מחק</button>
+      <div class="notif-item ${n.read?'':'unread'}" id="notif-${n.id}">
+        <div style="font-size:14px;margin-bottom:4px" onclick="goToNotif('${n.id}','${n.catId}','${n.recipeId}')">${n.message}</div>
+        <div style="font-size:12px;color:#6b7280">${date}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  notifications.slice(0,30).forEach(n => {
+    const item = document.getElementById("notif-"+n.id);
+    if (!item) return;
+    let startX = 0;
+    item.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
+    item.addEventListener("touchmove", e => {
+      const diff = startX - e.touches[0].clientX;
+      if (diff > 10) item.style.transform = `translateX(-${Math.min(diff,75)}px)`;
+      else if (diff < -5) item.style.transform = "translateX(0)";
+    }, { passive: true });
+    item.addEventListener("touchend", () => {
+      const x = parseFloat(item.style.transform.replace(/[^\d.-]/g,"")) || 0;
+      item.style.transform = x > 40 ? "translateX(-75px)" : "translateX(0)";
+    });
+  });
+}
+
+function deleteNotif(notifId) {
+  db.collection("notifications").doc(notifId).delete().then(() => {
+    notifications = notifications.filter(n => n.id !== notifId);
+    const unread = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById("notifBadge");
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? "flex" : "none";
+    renderNotifList();
+  });
+}
+
+function goToNotif(notifId, catId, recipeId) {
+  db.collection("notifications").doc(notifId).update({ read: true });
+  document.getElementById("notifPanel").classList.remove("open");
+  currentCategory = catId; showRecipe(recipeId);
+}
+
+function toggleNotifPanel() { document.getElementById("notifPanel").classList.toggle("open"); }
+
+async function loadFavorites() {
+  if (!currentUser) { userFavorites = []; return; }
+  try {
+    const d = await db.collection("favorites").doc(currentUser.uid).get();
+    userFavorites = d.exists ? (d.data().list || []) : [];
+  } catch(e) { userFavorites = []; }
+}
+
+async function toggleFavorite(recipeId, catId, recipeName) {
+  if (!currentUser) { alert("יש להתחבר כדי לשמור מועדפים"); return; }
+  const isFav = userFavorites.some(f => f.id === recipeId);
+  userFavorites = isFav ? userFavorites.filter(f => f.id !== recipeId) : [...userFavorites, { id: recipeId, cat: catId }];
+  await db.collection("favorites").doc(currentUser.uid).set({ list: userFavorites });
+  if (!isFav && recipeName) await addNotification("like", `❤️ ${currentUser.displayName || "מישהו"} אהב את "${recipeName}"`, catId, recipeId);
+  return !isFav;
+}
+
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  auth.signInWithPopup(provider).catch(e => {
+    if (e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") {
+      alert("שגיאה: " + e.message);
+    }
+  });
+}
+
+function viewOnlyMode() { isViewOnly = true; showHome(); }
+
+function signOutUser() {
+  if (unsubNotif) unsubNotif();
+  auth.signOut();
+  isViewOnly = false; isAdmin = false; userFavorites = [];
+  document.getElementById("notifBtn").style.display = "none";
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("headerSub").textContent = "";
+  showPage("loginPage");
+}
+
+auth.onAuthStateChanged(async user => {
+  currentUser = user;
+  if (user && user.uid === ADMIN_UID) {
+    isAdmin = true; isViewOnly = false;
+    document.getElementById("logoutBtn").style.display = "block";
+    document.getElementById("logoutBtn").onclick = signOutUser;
+    document.getElementById("headerSub").textContent = "מנהל: " + user.displayName;
+    await loadFavorites();
+    listenNotifications();
+    if (!checkDeepLink()) showHome();
+  } else if (user) {
+    isAdmin = false; isViewOnly = false;
+    document.getElementById("logoutBtn").style.display = "block";
+    document.getElementById("logoutBtn").onclick = signOutUser;
+    document.getElementById("headerSub").textContent = user.displayName;
+    await loadFavorites();
+    if (!checkDeepLink()) showHome();
+  } else {
+    if (!isViewOnly) showPage("loginPage");
+    document.getElementById("logoutBtn").style.display = "none";
+    document.getElementById("notifBtn").style.display = "none";
+  }
+});
+
+async function loadAllRecipes() {
+  allRecipes = [];
+  for (const cat of CATEGORIES) {
+    const snap = await db.collection(cat.id).get();
+    snap.forEach(d => allRecipes.push({ id: d.id, catId: cat.id, ...d.data() }));
+  }
+}
+
+function showHome() {
+  document.getElementById("backBtn").style.display = "none";
+  if (!currentUser && isViewOnly) {
+    document.getElementById("headerSub").textContent = "צפייה בלבד";
+    document.getElementById("logoutBtn").style.display = "block";
+    document.getElementById("logoutBtn").onclick = () => { isViewOnly = false; showPage("loginPage"); document.getElementById("logoutBtn").style.display = "none"; document.getElementById("headerSub").textContent = ""; };
+  }
+  const favColor = document.body.classList.contains("light") ? "#4f46e5" : "#818cf8";
+  const favBg = document.body.classList.contains("light") ? "#eef2ff" : "#1a1a2e";
+  const el = document.getElementById("homePage");
+  const favBtn = currentUser ? `
+    <div onclick="showFavorites()" style="background:${favBg};border:1px solid ${document.body.classList.contains("light")?"#c7d2fe":"#6366f133"};border-radius:14px;padding:20px;margin-bottom:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:18px;font-weight:700;color:${favColor};font-family:'David',serif">❤️ המתכונים שאהבתי</div>
+        <div class="sub-text" style="font-size:13px;margin-top:3px">${userFavorites.length} מתכונים שמורים</div>
+      </div>
+      <span style="color:${favColor};font-size:20px">←</span>
+    </div>` : "";
+  el.innerHTML = `
+    <div style="text-align:center;margin-bottom:24px">
+      <h2 style="font-family:'David',serif;font-size:28px;margin-bottom:8px">ברוכים הבאים</h2>
+      <p class="sub-text">בחר קטגוריה לצפייה במתכונים</p>
+    </div>
+    <div class="search-bar">
+      <input class="search-input" placeholder="🔍 חפש מתכון..." id="searchInput" dir="rtl" oninput="debouncedSearch(this.value)">
+    </div>
+    ${favBtn}
+    ${CATEGORIES.map(c => `
+      <div class="card" onclick="showCategory('${c.id}')" style="background:${getCatBg(c)};border-color:${c.color}44;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:${c.color};font-family:'David',serif">${c.label}</div>
+          <div class="sub-text" style="font-size:13px;margin-top:3px" id="count-${c.id}">טוען...</div>
+        </div>
+        <span style="color:${c.color};font-size:20px">←</span>
+      </div>`).join("")}`;
+  showPage("homePage");
+  CATEGORIES.forEach(async c => {
+    const snap = await db.collection(c.id).get();
+    const el = document.getElementById("count-" + c.id);
+    if (el) el.textContent = snap.size + " מתכונים";
+  });
+  loadAllRecipes();
+}
+
+let searchTimer = null;
+function debouncedSearch(val) {
+  clearTimeout(searchTimer);
+  if (!val.trim()) return;
+  searchTimer = setTimeout(() => handleSearch(val), 1200);
+}
+
+function handleSearch(val) {
+  const term = val.trim().toLowerCase();
+  const results = allRecipes.filter(r => r.name?.toLowerCase().includes(term) || r.ingredients?.toLowerCase().includes(term) || r.instructions?.toLowerCase().includes(term));
+  document.getElementById("backBtn").style.display = "block";
+  document.getElementById("backBtn").onclick = showHome;
+  const el = document.getElementById("searchPage");
+  el.innerHTML = `
+    <div class="search-bar" style="margin-bottom:16px">
+      <input class="search-input" placeholder="🔍 חפש מתכון..." id="searchInput2" dir="rtl" value="${val}" oninput="debouncedSearch(this.value)">
+    </div>
+    <p class="sub-text" style="font-size:14px;margin-bottom:20px">חיפשת: "<strong>${val}</strong>" — ${results.length} תוצאות</p>
+    ${results.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">🔍</div><p class="sub-text">לא נמצאו מתכונים</p></div>` :
+      results.map(r => { const cat = CATEGORIES.find(c => c.id === r.catId);
+        return `<div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;margin-bottom:12px;cursor:pointer" onclick="currentCategory='${r.catId}';showRecipe('${r.id}')">
+          <div style="font-weight:600;font-size:16px">${r.name}</div>
+          <div style="color:${cat.color};font-size:12px;margin-top:4px">${cat.label}</div>
+        </div>`;}).join("")}`;
+  showPage("searchPage");
+  const inp2 = document.getElementById("searchInput2");
+  if (inp2) { inp2.focus(); inp2.setSelectionRange(inp2.value.length, inp2.value.length); }
+}
+
+async function showFavorites() {
+  document.getElementById("backBtn").style.display = "block";
+  document.getElementById("backBtn").onclick = showHome;
+  const el = document.getElementById("favoritesPage");
+  el.innerHTML = `<div class="spinner"></div>`;
+  showPage("favoritesPage");
+  const favRecipes = [];
+  for (const fav of userFavorites) {
+    const snap = await db.collection(fav.cat).get();
+    snap.forEach(d => { if(d.id === fav.id) favRecipes.push({ id: d.id, catId: fav.cat, ...d.data() }); });
+  }
+  const favColor = document.body.classList.contains("light") ? "#4f46e5" : "#818cf8";
+  el.innerHTML = `
+    <h2 style="font-family:'David',serif;font-size:24px;color:${favColor};margin-bottom:20px">❤️ המתכונים שאהבתי</h2>
+    ${favRecipes.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">❤️</div><p class="sub-text">עדיין לא שמרת מועדפים</p></div>` :
+      favRecipes.map(r => { const cat = CATEGORIES.find(c => c.id === r.catId);
+        return `<div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div onclick="currentCategory='${r.catId}';showRecipe('${r.id}')" style="flex:1;cursor:pointer">
+            <div style="font-weight:600;font-size:16px">${r.name}</div>
+            <div style="color:${cat.color};font-size:12px;margin-top:4px">${cat.label}</div>
+          </div>
+          <button class="heart-btn" onclick="removeFav('${r.id}','${r.catId}')">❤️</button>
+        </div>`;}).join("")}`;
+}
+
+async function removeFav(id, catId) { await toggleFavorite(id, catId, ""); showFavorites(); }
+
+async function showCategory(catId) {
+  currentCategory = catId;
+  const cat = CATEGORIES.find(c => c.id === catId);
+  document.getElementById("backBtn").style.display = "block";
+  document.getElementById("backBtn").onclick = showHome;
+  document.getElementById("headerSub").textContent = cat.label;
+  const el = document.getElementById("categoryPage");
+  el.innerHTML = `<div class="spinner"></div>`;
+  showPage("categoryPage");
+  const snap = await db.collection(catId).orderBy("createdAt", "desc").get();
+  const recipes = [];
+  snap.forEach(d => recipes.push({ id: d.id, ...d.data() }));
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="font-family:'David',serif;font-size:24px;color:${cat.color}">${cat.label}</h2>
+      ${isAdmin ? `<button class="btn btn-primary" onclick="showForm(null)" style="padding:8px 18px">+ הוסף</button>` : ""}
+    </div>
+    ${recipes.length === 0 ? `<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">🍴</div><p class="sub-text">אין מתכונים עדיין</p></div>` :
+      recipes.map(r => { const isFav = userFavorites.some(f => f.id === r.id);
+        return `<div style="background:${getCatBg(cat)};border-radius:12px;padding:16px;border:1px solid ${cat.color}44;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div onclick="showRecipe('${r.id}')" style="flex:1;cursor:pointer">
+            <div style="font-weight:600;font-size:16px">${r.name}</div>
+            <div class="sub-text" style="font-size:13px;margin-top:4px">${(r.comments||[]).length} תגובות${r.cookTime?` · ⏱️ ${r.cookTime}`:""}${r.difficulty?` · ${r.difficulty}`:""}</div>
+          </div>
+          ${currentUser ? `<button class="heart-btn" onclick="handleHeart('${r.id}','${catId}','${r.name.replace(/'/g,"\\'")}',this)">${isFav?'❤️':'🤍'}</button>` : ""}
+          ${isAdmin ? `<div class="dots-menu"><button class="dots-btn" onclick="toggleMenu('${r.id}',event)">
+            <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
+            <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
+            <span style="width:4px;height:4px;border-radius:50%;background:#9ca3af;display:block"></span>
+          </button>
+          <div class="dots-dropdown" id="dd-${r.id}">
+            <button class="dots-item" style="color:${cat.color}" onclick="showForm('${r.id}')">✏️ ערוך</button>
+            <div style="height:1px;background:#374151"></div>
+            <button class="dots-item danger" onclick="openDeleteModal('${r.id}','${r.name.replace(/'/g,"\\'")}')">🗑️ מחק</button>
+          </div></div>` : ""}
+        </div>`;}).join("")}`;
+}
+
+async function handleHeart(recipeId, catId, recipeName, btn) {
+  const isFav = await toggleFavorite(recipeId, catId, recipeName);
+  if (btn) btn.textContent = isFav ? '❤️' : '🤍';
+}
+
+function toggleMenu(id, e) {
+  e.stopPropagation();
+  document.querySelectorAll(".dots-dropdown").forEach(d => { if(d.id !== "dd-"+id) d.classList.remove("open"); });
+  document.getElementById("dd-"+id).classList.toggle("open");
+}
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".dots-menu")) document.querySelectorAll(".dots-dropdown").forEach(d => d.classList.remove("open"));
+  if (!e.target.closest("#notifBtn") && !e.target.closest("#notifPanel")) {
+    const np = document.getElementById("notifPanel");
+    if (np) np.classList.remove("open");
+  }
+});
+
+async function showRecipe(recipeId) {
+  const cat = CATEGORIES.find(c => c.id === currentCategory);
+  if (!cat) return;
+  const d = await db.collection(currentCategory).doc(recipeId).get();
+  if (!d.exists) return;
+  const recipe = { id: d.id, ...d.data() };
+  currentRecipe = recipe;
+  document.getElementById("backBtn").style.display = "block";
+  document.getElementById("backBtn").onclick = () => showCategory(currentCategory);
+  const comments = recipe.comments || [];
+  const avg = comments.length > 0 ? (comments.reduce((s,c)=>s+c.rating,0)/comments.length).toFixed(1) : null;
+  const isFav = userFavorites.some(f => f.id === recipeId);
+  const diffMap = {"קל 🟢":"#16a34a","בינוני 🟡":"#ca8a04","קשה 🔴":"#dc2626"};
+  const diffColor = diffMap[recipe.difficulty] || "#6b7280";
+  const el = document.getElementById("recipePage");
+  el.innerHTML = `
+    <div class="recipe-card" style="border-radius:16px;border:1px solid ${cat.color}44;padding:24px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;flex-wrap:wrap">
+        <h2 style="color:${cat.color};font-size:24px;font-family:'David',serif;flex:1">${recipe.name}</h2>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${currentUser ? `<button class="heart-btn" id="recipeHeart" onclick="handleRecipeHeart('${recipeId}','${currentCategory}','${recipe.name.replace(/'/g,"\\'")}')"> ${isFav?'❤️':'🤍'}</button>` : ""}
+          <button onclick="shareWhatsapp('${recipeId}')" style="background:#25d366;border:none;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:600">📤 שתף</button>
+          <button class="wakelock-btn" id="wakeBtn" onclick="toggleWakeLock()">💡 שמור דולק</button>
+        </div>
+      </div>
+      ${avg ? `<div style="color:#facc15;margin-bottom:10px">★ ${avg} (${comments.length} ביקורות)</div>` : ""}
+      ${(recipe.cookTime||recipe.difficulty) ? `<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        ${recipe.cookTime?`<span style="background:rgba(99,102,241,0.15);color:#818cf8;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600">⏱️ ${recipe.cookTime}</span>`:""}
+        ${recipe.difficulty?`<span style="background:${diffColor}22;color:${diffColor};padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600">${recipe.difficulty}</span>`:""}
+      </div>`:""}
+      <h3 class="recipe-heading" style="font-size:15px;margin-bottom:8px">🧂 מצרכים</h3>
+      <ul class="recipe-text" style="line-height:1.9;padding-right:22px;padding-left:0;margin-bottom:20px">
+        ${recipe.ingredients.split(/,|،|\n/).filter(i=>i.trim()).map(i=>`<li>${i.trim()}</li>`).join("")}
+      </ul>
+      <h3 class="recipe-heading" style="font-size:15px;margin-bottom:8px">👨‍🍳 אופן הכנה</h3>
+      <p class="recipe-text" style="line-height:1.8;white-space:pre-wrap">${recipe.instructions}</p>
+    </div>
+    <div class="comments-section" style="border-radius:16px;border:1px solid;padding:24px">
+      <h3 style="font-size:18px;font-family:'David',serif;margin-bottom:20px">💬 תגובות</h3>
+      ${comments.length===0?`<p class="sub-text" style="font-size:14px;margin-bottom:16px">עדיין אין תגובות.</p>`:
+        comments.map((c,i)=>`<div class="comment-card" style="border-right:3px solid ${cat.color}">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:center">
+            <span style="color:${cat.color};font-weight:600">${c.user}</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="color:#facc15">${"★".repeat(c.rating)}${"☆".repeat(5-c.rating)}</span>
+              ${isAdmin ? `<button onclick="deleteComment('${recipeId}',${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:16px;padding:2px 4px">🗑️</button>` : ""}
+            </div>
+          </div>
+          <p class="recipe-text" style="font-size:14px">${c.text}</p>
+        </div>`).join("")}
+      <div style="padding-top:20px;margin-top:8px;border-top:1px solid #374151">
+        <input id="commentUser" class="input-field" placeholder="השם שלך (אופציונלי)" dir="rtl">
+        <textarea id="commentText" class="input-field" placeholder="כתוב תגובה..." rows="3" style="resize:vertical;height:80px" dir="rtl"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:4px;direction:ltr">
+            ${[1,2,3,4,5].map(s=>`<span class="star" data-star="${s}" onclick="setRating(${s})">★</span>`).join("")}
+          </div>
+          <button class="btn btn-primary" onclick="submitComment('${recipeId}','${recipe.name.replace(/'/g,"\\'")}')">שלח תגובה</button>
+        </div>
+      </div>
+    </div>`;
+  showPage("recipePage");
+}
+
+async function handleRecipeHeart(recipeId, catId, recipeName) {
+  const isFav = await toggleFavorite(recipeId, catId, recipeName);
+  const btn = document.getElementById("recipeHeart");
+  if (btn) btn.textContent = isFav ? '❤️' : '🤍';
+}
+
+function shareWhatsapp(recipeId) {
+  const url = `${SITE_URL}?cat=${currentCategory}&recipe=${recipeId}`;
+  const text = `בוא תראה את המתכון "${currentRecipe.name}" בספר המתכונים של גיא שלומי! 🍽️\n${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+async function toggleWakeLock() {
+  if (wakeLock) { await releaseWakeLock(); } else { await requestWakeLock(); }
+  const btn = document.getElementById("wakeBtn");
+  if (btn) { btn.className = `wakelock-btn${wakeLock?' active':''}`; btn.textContent = wakeLock ? '🔆 דולק' : '💡 שמור דולק'; }
+}
+
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll(".star").forEach(s => s.classList.toggle("active", parseInt(s.dataset.star) <= n));
+}
+
+async function submitComment(recipeId, recipeName) {
+  const text = document.getElementById("commentText").value.trim();
+  if (!text || selectedRating === 0) { alert("נא למלא תגובה ודירוג"); return; }
+  const user = document.getElementById("commentUser").value.trim() || "אנונימי";
+  const comments = [...(currentRecipe.comments||[]), { user, text, rating: selectedRating }];
+  await db.collection(currentCategory).doc(recipeId).update({ comments });
+  await addNotification("comment", `💬 ${user} הגיב על "${recipeName}": "${text.slice(0,40)}" ⭐${selectedRating}`, currentCategory, recipeId);
+  currentRecipe.comments = comments; selectedRating = 0;
+  showRecipe(recipeId);
+}
+
+async function deleteComment(recipeId, index) {
+  if (!confirm("האם אתה בטוח שברצונך למחוק תגובה זו?")) return;
+  const comments = [...(currentRecipe.comments||[])];
+  comments.splice(index, 1);
+  await db.collection(currentCategory).doc(recipeId).update({ comments });
+  currentRecipe.comments = comments;
+  showRecipe(recipeId);
+}
+
+async function showForm(recipeId) {
+  let editingRecipe = null;
+  const cat = CATEGORIES.find(c => c.id === currentCategory);
+  let name="", ingredients="", instructions="";
+  if (recipeId) {
+    const d = await db.collection(currentCategory).doc(recipeId).get();
+    if (d.exists) { editingRecipe = {id:d.id,...d.data()}; name=editingRecipe.name; ingredients=editingRecipe.ingredients; instructions=editingRecipe.instructions; }
+  }
+  const savedDiff = editingRecipe?.difficulty || "";
+  document.getElementById("backBtn").onclick = () => showCategory(currentCategory);
+  document.getElementById("formPage").innerHTML = `
+    <div class="recipe-card" style="border-radius:16px;border:1px solid ${cat.color}55;padding:24px">
+      <h2 style="color:${cat.color};font-family:'David',serif;font-size:22px;margin-bottom:20px">${recipeId?"✏️ עריכת מתכון":"✍️ הוספת מתכון חדש"}</h2>
+      <label class="label">שם המתכון *</label>
+      <input id="fName" class="input-field" value="${name}" placeholder="לדוג׳: פסטה בולונז" dir="rtl">
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <div style="flex:1">
+          <label class="label">⏱️ זמן הכנה</label>
+          <input id="fTime" class="input-field" value="${editingRecipe?.cookTime||''}" placeholder="למשל: 30 דק׳" dir="rtl" style="margin-bottom:0">
+        </div>
+        <div style="flex:1">
+          <label class="label">רמת קושי</label>
+          <div style="display:flex;gap:6px;margin-top:4px">
+            ${["קל 🟢","בינוני 🟡","קשה 🔴"].map(d=>`<button type="button" class="diff-btn${savedDiff===d?' selected':''}" data-diff="${d}" onclick="selectDiff(this)">${d}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+      <label class="label">מצרכים *</label>
+      <textarea id="fIngredients" class="input-field" placeholder="ציין את כל המצרכים..." rows="4" style="height:100px;resize:vertical" dir="rtl">${ingredients}</textarea>
+      <label class="label">אופן הכנה *</label>
+      <textarea id="fInstructions" class="input-field" placeholder="תאר את שלבי ההכנה..." rows="5" style="height:130px;resize:vertical" dir="rtl">${instructions}</textarea>
+      <button class="btn btn-primary" onclick="saveRecipe('${recipeId||""}')" style="width:100%;padding:14px;font-size:16px;border-radius:10px;margin-top:4px">
+        💾 ${recipeId?"שמור שינויים":"שמור מתכון"}
+      </button>
+    </div>`;
+  showPage("formPage");
+}
+
+function selectDiff(btn) {
+  document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+}
+
+async function saveRecipe(recipeId) {
+  const name = document.getElementById("fName").value.trim();
+  const ingredients = document.getElementById("fIngredients").value.trim();
+  const instructions = document.getElementById("fInstructions").value.trim();
+  const cookTime = document.getElementById("fTime").value.trim();
+  const diffBtn = document.querySelector(".diff-btn.selected");
+  const difficulty = diffBtn ? diffBtn.dataset.diff : "";
+  if (!name||!ingredients||!instructions) { alert("נא למלא את כל השדות"); return; }
+  const data = { name, ingredients, instructions, cookTime, difficulty };
+  if (recipeId) { await db.collection(currentCategory).doc(recipeId).update(data); }
+  else { await db.collection(currentCategory).add({...data, comments:[], createdAt: firebase.firestore.FieldValue.serverTimestamp()}); }
+  showCategory(currentCategory);
+}
+
+function openDeleteModal(id, name) {
+  deleteTargetId = id;
+  document.getElementById("deleteRecipeName").textContent = name;
+  document.getElementById("deleteModal").style.display = "flex";
+}
+function closeDeleteModal() { document.getElementById("deleteModal").style.display = "none"; deleteTargetId = null; }
+async function confirmDelete() {
+  await db.collection(currentCategory).doc(deleteTargetId).delete();
+  closeDeleteModal(); showCategory(currentCategory);
+}
+</script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyBXUxSpdJO052huhnyEPSOAlWYV4Ti9Tyk",
@@ -328,7 +876,7 @@ window.goToNotif = async (notifId, catId, recipeId) => {
   currentCategory = catId; window.showRecipe(recipeId);
 };
 
-
+None
 
 window.toggleNotifPanel = () => document.getElementById("notifPanel").classList.toggle("open");
 
@@ -738,4 +1286,4 @@ window.confirmDelete = async () => {
 };
 </script>
 </body>
-</html>
+  </html>
