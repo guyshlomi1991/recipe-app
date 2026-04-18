@@ -136,12 +136,12 @@
   <div style="font-size:60px;margin-bottom:16px">🍽️</div>
   <h2 style="font-size:26px;margin-bottom:8px;font-family:'David',serif">ספר המתכונים של גיא שלומי</h2>
   <p class="sub-text" style="margin-bottom:40px;font-size:15px">התחבר כדי לצפות במתכונים ולשמור מועדפים</p>
-  <button class="btn-google" onclick="signInWithGoogle()" style="margin:0 auto 16px">
+  <button class="btn-google" id="btnGoogle" style="margin:0 auto 16px">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.5 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.7-3.5-11.3-8.3l-6.5 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.8l6.2 5.2C41 35.8 44 30.3 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
     התחבר עם Google
   </button>
   <br>
-  <button class="btn btn-outline" onclick="viewOnlyMode()" style="margin:0 auto">👁️ צפייה בלבד</button>
+  <button class="btn btn-outline" id="btnViewOnly" style="margin:0 auto">👁️ צפייה בלבד</button>
 </div>
 
 <div id="homePage" class="page container"></div>
@@ -328,7 +328,7 @@ window.goToNotif = async (notifId, catId, recipeId) => {
   currentCategory = catId; window.showRecipe(recipeId);
 };
 
-None
+
 
 window.toggleNotifPanel = () => document.getElementById("notifPanel").classList.toggle("open");
 
