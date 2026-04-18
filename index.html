@@ -328,7 +328,7 @@ window.goToNotif = async (notifId, catId, recipeId) => {
   currentCategory = catId; window.showRecipe(recipeId);
 };
 
-
+None
 
 window.toggleNotifPanel = () => document.getElementById("notifPanel").classList.toggle("open");
 
@@ -601,10 +601,13 @@ window.showRecipe = async (recipeId) => {
     <div class="comments-section" style="border-radius:16px;border:1px solid;padding:24px">
       <h3 style="font-size:18px;font-family:'David',serif;margin-bottom:20px">💬 תגובות</h3>
       ${comments.length===0?`<p class="sub-text" style="font-size:14px;margin-bottom:16px">עדיין אין תגובות.</p>`:
-        comments.map(c=>`<div class="comment-card" style="border-right:3px solid ${cat.color}">
-          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        comments.map((c,i)=>`<div class="comment-card" style="border-right:3px solid ${cat.color}">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:center">
             <span style="color:${cat.color};font-weight:600">${c.user}</span>
-            <span style="color:#facc15">${"★".repeat(c.rating)}${"☆".repeat(5-c.rating)}</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="color:#facc15">${"★".repeat(c.rating)}${"☆".repeat(5-c.rating)}</span>
+              ${isAdmin ? `<button onclick="deleteComment('${recipeId}',${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:16px;padding:2px 4px" title="מחק תגובה">🗑️</button>` : ""}
+            </div>
           </div>
           <p class="recipe-text" style="font-size:14px">${c.text}</p>
         </div>`).join("")}
@@ -643,6 +646,15 @@ window.toggleWakeLock = async () => {
 window.setRating = (n) => {
   selectedRating = n;
   document.querySelectorAll(".star").forEach(s => s.classList.toggle("active", parseInt(s.dataset.star) <= n));
+};
+
+window.deleteComment = async (recipeId, index) => {
+  if (!confirm("האם אתה בטוח שברצונך למחוק תגובה זו?")) return;
+  const comments = [...(currentRecipe.comments||[])];
+  comments.splice(index, 1);
+  await updateDoc(doc(db, currentCategory, recipeId), { comments });
+  currentRecipe.comments = comments;
+  window.showRecipe(recipeId);
 };
 
 window.submitComment = async (recipeId, recipeName) => {
