@@ -287,11 +287,15 @@ window.goToNotif = async (notifId, catId, recipeId) => {
 };
 
 window.markAllRead = async () => {
-  const promises = notifications.filter(n => !n.read).map(n => updateDoc(doc(db, "notifications", n.id), { read: true }));
-  await Promise.all(promises);
-  notifications = notifications.map(n => ({ ...n, read: true }));
-  document.getElementById("notifBadge").style.display = "none";
-  renderNotifList();
+  try {
+    const unread = notifications.filter(n => !n.read);
+    if (unread.length === 0) return;
+    await Promise.all(unread.map(n => updateDoc(doc(db, "notifications", n.id), { read: true })));
+    notifications = notifications.map(n => ({ ...n, read: true }));
+    const badge = document.getElementById("notifBadge");
+    if (badge) { badge.style.display = "none"; badge.textContent = "0"; }
+    renderNotifList();
+  } catch(e) { console.log(e); }
 };
 
 window.toggleNotifPanel = () => document.getElementById("notifPanel").classList.toggle("open");
