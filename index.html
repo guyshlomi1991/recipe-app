@@ -486,6 +486,23 @@ auth.onAuthStateChanged(async function(user){
     document.getElementById("notifBtn").style.display="none";
   }
 });
+    isAdmin=true;isViewOnly=false;
+    document.getElementById("logoutBtn").style.display="block";
+    document.getElementById("headerSub").textContent="מנהל: "+(user.displayName||user.email);
+    await loadFavorites();listenNotifications();
+    if(!checkDeepLink())showHome();
+  }else if(user){
+    isAdmin=false;isViewOnly=false;
+    document.getElementById("logoutBtn").style.display="block";
+    document.getElementById("headerSub").textContent=user.displayName||user.email||"משתמש";
+    await loadFavorites();
+    if(!checkDeepLink())showHome();
+  }else{
+    if(!isViewOnly)showPage("loginPage");
+    document.getElementById("logoutBtn").style.display="none";
+    document.getElementById("notifBtn").style.display="none";
+  }
+});
 
 document.addEventListener("click",function(e){
   if(!e.target.closest(".dots-menu"))document.querySelectorAll(".dots-dropdown").forEach(function(d){d.classList.remove("open");});
