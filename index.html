@@ -85,7 +85,6 @@ body.light .auth-box { background: #ffffff; border-color: #e5e7eb; }
 .modal { border-radius: 16px; border: 1px solid; padding: 28px 24px; max-width: 380px; width: 100%; text-align: center; }
 .page { display: none !important; }
 .page.active { display: block !important; }
-#loginPage.active { display: flex !important; }
 .spinner { width: 40px; height: 40px; border: 3px solid #374151; border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 40px auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .star { font-size: 22px; cursor: pointer; color: #9ca3af; }
@@ -176,7 +175,7 @@ body.light .divider-line { background: #e5e7eb; }
 </div>
 
 <!-- LOGIN PAGE -->
-<div id="loginPage" class="page active container" style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding-top:20px">
+<div id="loginPage" class="page active container" style="padding-top:20px">
   <div class="auth-box">
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:48px;margin-bottom:8px">🍽️</div>
@@ -251,7 +250,8 @@ firebase.initializeApp({
   appId: "1:125665332795:web:95c022300e37aa8ec9961e"
 });
 
-var auth = firebase.auth();
+  var authBox = document.querySelector(".auth-box");
+  if(authBox) authBox.style.cssText = "margin:0 auto;max-width:380px;";
 var db = firebase.firestore();
 var TELEGRAM_TOKEN = "8786680475:AAFXx_UFWY8upN-n6htpv1B-QiULM4FQBV4";
 var TELEGRAM_CHAT_ID = "7091167889";
